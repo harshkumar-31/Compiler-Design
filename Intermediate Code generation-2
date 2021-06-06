@@ -1,0 +1,95 @@
+import pandas as pd
+OPERATORS = set(['+', '-', '*', '/', '(', ')'])
+PRI = {'+':1, '-':1, '*':2, '/':2}
+list=[]
+dict={}
+dicti={}
+
+def infix_to_postfix(formula):
+    stack = []
+    output = ''
+    for ch in formula:
+        if ch not in OPERATORS:
+            output += ch
+        elif ch == '(':
+            stack.append('(')
+        elif ch == ')':
+            while stack and stack[-1] != '(':
+                output += stack.pop()
+            stack.pop()
+        else:
+            while stack and stack[-1] != '(' and PRI[ch] <= PRI[stack[-1]]:
+                output += stack.pop()
+            stack.append(ch)
+    while stack: 
+        output += stack.pop()
+    print(f'\nPOSTFIX: {output}\n')
+    return output
+
+def generate3AC(pos):
+    print("THREE ADDRESS CODE GENERATION")
+    exp_stack = []
+    t = 0
+    
+    for i in pos:
+        if i not in OPERATORS:
+            exp_stack.append(i)
+        else:
+            print(f't{t} := {exp_stack[-2]} {i} {exp_stack[-1]}')
+            list.append(f't{t} := {exp_stack[-2]} {i} {exp_stack[-1]}')
+            exp_stack=exp_stack[:-2]
+            exp_stack.append(f't{t}')
+            t+=1
+
+expres = input("\nINPUT THE EXPRESSION: ")
+pos = infix_to_postfix(expres)
+generate3AC(pos)
+print("\nQUADRUPLE")
+print("OP\t"+"Agr1\t"+" Agr2\t"+"Result")
+c = 0
+co=10010
+for i in list:
+    x = i.split(" ")
+    for j in x:
+        if j in OPERATORS:
+            print(j,"  ",end = "\t")
+            print(x[2],"\t",x[4]+"\t"+x[0])
+            dict[x[0]] = c
+            dicti[c] = co
+    c+=1
+    co+=1
+
+print("\nTRIPLE")
+print("\tOP\t"+"Agr1\t"+"Agr2")
+for i in list:
+    x = i.split(" ")
+    for j in x:
+        if j in OPERATORS:
+            print("[",dict[x[0]],"]",end = "\t")
+            print(j,"  ",end = "\t")
+            if x[2] in dict.keys() and x[4] in dict.keys():
+                print("[",dict[x[2]],"]\t[",dict[x[4]],"]")
+            elif x[2] in dict.keys():
+                print("[",dict[x[2]],"]\t",x[4])
+            elif x[4] in dict.keys():
+                print(x[2],"\t[",dict[x[4]],"]")
+            else:
+                print(x[2],"\t",x[4])
+
+print("\nINDIRECT TRIPLE")
+print("\t\tOP\t"+"Agr1\t\t"+"Agr2")
+for i in list:
+    x = i.split(" ")
+    for j in x:
+        if j in OPERATORS:
+            print("[",dicti[dict[x[0]]],"]",end = "\t")
+            print(j,"  ",end = "\t")
+            if x[2] in dict.keys() and x[4] in dict.keys():
+                print("[",dicti[dict[x[2]]],"]\t[",dicti[dict[x[4]]],"]")
+            elif x[2] in dict.keys():
+                print("[",dicti[dict[x[2]]],"]\t",x[4])
+            elif x[4] in dict.keys():
+                print(x[2],"\t[",dicti[dict[x[4]]],"]")
+            else:
+                print(x[2],"\t\t",x[4])
+print()
